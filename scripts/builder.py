@@ -55,7 +55,7 @@ class Report:
 
     def __init__(self, work_no, mdk, title, student="Разин Константин Евгеньевич",
                  student_short="Разин К.Е.", group="47",
-                 specialty="", teacher="", city_year="Самара, 2026"):
+                 specialty="", teacher="", city_year="Новокуйбышевск, 2026"):
         self.doc = Document()
         self.fig_no = 0
         self.tab_no = 0
@@ -206,8 +206,9 @@ class Report:
     def title_page(self, org_lines=None):
         org = org_lines or [
             "МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ САМАРСКОЙ ОБЛАСТИ",
-            "Государственное бюджетное профессиональное образовательное учреждение",
-            "«Самарский государственный колледж сервисных технологий и дизайна»",
+            "Государственное автономное профессиональное образовательное учреждение",
+            "Самарской области",
+            "«Новокуйбышевский гуманитарно-технологический колледж»",
         ]
         for line in org:
             self.p(line, indent=0, align="center", size=12, bold=False, line=1.15)
