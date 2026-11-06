@@ -13,40 +13,51 @@ os.makedirs(OUT, exist_ok=True)
 
 # --------------------------------------------------------------- ПЗ 1: структура ИС
 def is_structure():
-    f = Flow(1400, 900)
+    f = Flow(1560, 720)
     f.title("Структура информационной системы «Библиотека»")
-    f.block("users", 560, 62, 280, 54, "Пользователи АИС", "term", "#EFEFEF", "#7A7A7A", 15)
-    f.block("web", 520, 150, 360, 62, "Клиентская часть (АРМ):\nбраузер, тонкий клиент",
-            "rect", LBLUE, BLUE, 14)
+    OX = 170          # левая колонка подписей уровней
+
+    def blk(key, x, y, w, h, text, shape="rect", fill=LBLUE, line=BLUE, size=14,
+            bold=True):
+        return f.block(key, x + OX, y, w, h, text, shape, fill, line, size, bold=bold)
+
+    blk("users", 560, 62, 280, 54, "Пользователи АИС", "term", "#333333", "#9A9A9A", 15)
+    blk("web", 520, 152, 360, 62, "Клиентская часть (АРМ):\nбраузер, тонкий клиент")
     f.link("users", "web")
-    f.block("srv", 480, 246, 440, 74, "Сервер приложений\n(бизнес-логика: обслуживание,\n"
-            "каталогизация, бронирование)", "rect", "#FDF3E2", "#C98A2B", 14)
+    blk("srv", 480, 252, 440, 76, "Сервер приложений\n(бизнес-логика: обслуживание,\n"
+        "каталогизация, бронирование)", "rect", "#3A2C12", "#F0A93B")
     f.link("web", "srv")
-    f.block("db", 120, 366, 300, 78, "База данных\nMS SQL Server:\nэлектронный каталог, "
-            "читатели, выдачи", "db", GREEN, GREENL, 13)
-    f.block("files", 550, 366, 300, 78, "Файловое хранилище:\nполные тексты,\nскан-копии, "
-            "отчёты", "db", GREEN, GREENL, 13)
-    f.block("ext", 980, 366, 300, 78, "Внешние сервисы:\nСБА, МБА, ЭБС,\nшлюз ЕГИСЗ/ГИС",
-            "rect", "#F2F2F2", "#8A8A8A", 13)
+    blk("db", 120, 392, 300, 66, "База данных (MS SQL Server):\nэлектронный каталог,\n"
+        "читатели, выдачи", "rect", GREEN, GREENL, 13)
+    blk("files", 550, 392, 300, 66, "Файловое хранилище:\nполные тексты, скан-копии,\n"
+        "отчёты", "rect", GREEN, GREENL, 13)
+    blk("ext", 980, 392, 300, 66, "Внешние сервисы:\nСБА, МБА, ЭБС,\nшлюз ЕГИСЗ/ГИС",
+        "rect", "#2A2A2A", "#6A6A6A", 13)
     f.link("srv", "db")
     f.link("srv", "files")
     f.link("srv", "ext")
-    f.block("backup", 120, 502, 300, 62, "Подсистема резервного\nкопирования", "rect",
-            "#EFEFEF", "#8A8A8A", 13)
-    f.link("db", "backup", dashed=True, color="#8A8A8A")
-    f.block("sec", 550, 502, 300, 62, "Подсистема\nразграничения доступа", "rect",
-            "#EFEFEF", "#8A8A8A", 13)
-    f.link("srv", "sec", dashed=True, color="#8A8A8A")
-    f.block("mon", 980, 502, 300, 62, "Подсистема мониторинга\nи журналирования",
-            "rect", "#EFEFEF", "#8A8A8A", 13)
-    f.link("srv", "mon", dashed=True, color="#8A8A8A")
-    # уровни
-    f.caption(30, 45, "Уровень представления", 12, "#7A7A7A", True)
-    f.caption(30, 240, "Уровень бизнес-логики", 12, "#7A7A7A", True)
-    f.caption(30, 360, "Уровень хранения данных", 12, "#7A7A7A", True)
-    f.caption(30, 496, "Обеспечивающие подсистемы", 12, "#7A7A7A", True)
-    for y in (126, 336, 478):
-        f.d.line([30, y, f.W - 30, y], fill="#E0E0E0", width=1)
+    blk("backup", 120, 530, 300, 60, "Подсистема резервного\nкопирования", "rect",
+        "#2A2A2A", "#6A6A6A", 13)
+    f.link("db", "backup", dashed=True, color="#6A6A6A")
+    blk("sec", 550, 530, 300, 60, "Подсистема\nразграничения доступа", "rect",
+        "#2A2A2A", "#6A6A6A", 13)
+    f.link("srv", "sec", dashed=True, color="#6A6A6A")
+    blk("mon", 980, 530, 300, 60, "Подсистема мониторинга\nи журналирования",
+        "rect", "#2A2A2A", "#6A6A6A", 13)
+    f.link("srv", "mon", dashed=True, color="#6A6A6A")
+
+    # уровни: подписи в отдельной колонке слева
+    levels = [(44, 236, "Уровень представления"),
+              (240, 346, "Уровень бизнес-логики"),
+              (352, 474, "Уровень хранения данных"),
+              (480, 600, "Обеспечивающие подсистемы")]
+    for y0, y1, name in levels:
+        cy = (y0 + y1) // 2
+        f.caption(26, cy - 9, name, 12, "#B8B8B8", True)
+        f.d.line([26, cy + 12, 150, cy + 12], fill="#3A3A3A", width=1)
+    for y in (236, 346, 476, 640):
+        f.d.line([OX - 20, y, f.W - 30, y], fill="#3A3A3A", width=1)
+    f.caption(26, 660, "Составлено автором по данным анализа ИС «Библиотека»", 11, "#8A8A8A")
     f.save(os.path.join(OUT, "is_structure.png"))
 
 
@@ -55,7 +66,7 @@ def arm_scheme():
     f = Flow(1400, 800)
     f.title("Структура автоматизированного рабочего места (АРМ)")
     f.block("arm", 520, 62, 360, 60, "АРМ специалиста\n(библиотекарь / каталогизатор)",
-            "rect", "#DCE9F7", BLUE, 15)
+            "rect", "#2D4B63", BLUE, 15)
     cols = [
         (["Технические средства", "ПЭВМ (CPU, ОЗУ, SSD)", "Монитор, клавиатура, мышь",
           "Сканер штрихкодов", "Принтер, МФУ", "ИБП"], 40, LBLUE, BLUE),
@@ -64,16 +75,16 @@ def arm_scheme():
         (["Информационное обеспечение", "База данных каталога", "Справочники, классификаторы",
           "Формы документов", "Регламенты, инструкции"], 720, ORANGE, ORANGEL),
         (["Организационное обеспечение", "Должностная инструкция", "Права доступа (роли)",
-          "Режим труда и отдыха", "Обучение пользователя"], 1060, "#F3F3F3", "#8A8A8A"),
+          "Режим труда и отдыха", "Обучение пользователя"], 1060, "#232323", "#6A6A6A"),
     ]
     for items, x, fill, line in cols:
         f.block(f"h_{x}", x, 190, 300, 62, items[0], "rect", fill, line, 14)
         f.link("arm", f"h_{x}")
         y = 292
         for it in items[1:]:
-            f.block(f"i_{x}_{y}", x + 10, y, 280, 52, it, "rect", "#FFFFFF", "#9AA9B8",
+            f.block(f"i_{x}_{y}", x + 10, y, 280, 52, it, "rect", "#1F1F1F", "#9AA9B8",
                     13, bold=False)
-            f.link(f"h_{x}", f"i_{x}_{y}", dashed=True, head=False, width=1, color="#9AA9B8")
+            f.d.line([x + 150, 252, x + 150, y], fill="#5A6A7A", width=1)
             y += 66
     f.save(os.path.join(OUT, "arm_scheme.png"))
 
@@ -85,7 +96,7 @@ def egai_utm():
             toolbar=["Создать", "Отправить", "Проверить", "Обновить", "Журнал"],
             status="Соединение с ЕГАИС: активно   |   Транспорт: RSA-ключ, ГОСТ 2012")
     x0, y0, x1 = w.x0, w.cy0, w.x1
-    w.d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 31], fill="#F5F7F9")
+    w.d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 31], fill="#1E1E1E")
     w.panel(x0 + 20, y0 + 18, 300, 210)
     w.text(x0 + 40, y0 + 32, "Состояние УТМ", 15, TXT, bold=True)
     st = [("Версия УТМ", "3.0.7"), ("Организация", 'ООО "БиблиоТорг"'),
@@ -100,17 +111,17 @@ def egai_utm():
     w.text(x0 + 360, y0 + 32, "Обмен документами с ЕГАИС", 15, TXT, bold=True)
     w.text(x0 + 360, y0 + 62, "Отправлено за сутки: 128    Принято: 126    "
            "Ошибок: 1    В очереди: 1", 13, TXT)
-    w.d.rounded_rectangle([x0 + 360, y0 + 92, x1 - 40, y0 + 116], radius=8, fill="#E3E7ED")
+    w.d.rounded_rectangle([x0 + 360, y0 + 92, x1 - 40, y0 + 116], radius=8, fill="#333333")
     w.d.rounded_rectangle([x0 + 360, y0 + 92, x0 + 360 + 700, y0 + 116], radius=8,
-                          fill="#2E7D32")
-    w.text(x0 + 360, y0 + 126, "Обмен выполнен на 96 %", 12, "#2E7D32", bold=True)
+                          fill="#6CCB5F")
+    w.text(x0 + 360, y0 + 126, "Обмен выполнен на 96 %", 12, "#6CCB5F", bold=True)
     w.text(x0 + 360, y0 + 156, "Последний сеанс связи: 06.11.2026 12:38:41", 12, MUTED)
     w.text(x0 + 360, y0 + 178, "Ошибка в документе № 0000-000431 (ТТН входящая): "
-           "неверный код продукции", 12, "#B03030")
+           "неверный код продукции", 12, "#FF99A4")
     # таблица документов
     w.panel(x0 + 20, y0 + 246, 1200, 480)
     w.text(x0 + 40, y0 + 260, "Журнал документов", 15, TXT, bold=True)
-    w.d.rectangle([x0 + 32, y0 + 292, x1 - 32, y0 + 320], fill="#EDF1F6")
+    w.d.rectangle([x0 + 32, y0 + 292, x1 - 32, y0 + 320], fill="#2C2C2C")
     for lab, cx in [("№ документа", x0 + 44), ("Тип документа", x0 + 210),
                     ("Контрагент", x0 + 430), ("Дата", x0 + 720),
                     ("Статус", x0 + 860), ("Сумма, руб.", x0 + 1020)]:
@@ -132,10 +143,10 @@ def egai_utm():
         w.text(x0 + 210, ry + 2, r[1], 12, TXT)
         w.text(x0 + 430, ry + 2, r[2], 12, TXT)
         w.text(x0 + 720, ry + 2, r[3], 12, TXT)
-        col = {"Принят": "#2E7D32", "Ошибка": "#B03030", "В очереди": "#B27500"}[r[4]]
+        col = {"Принят": "#6CCB5F", "Ошибка": "#FF99A4", "В очереди": "#FCE100"}[r[4]]
         w.text(x0 + 860, ry + 2, r[4], 12, col, bold=True)
         w.text(x0 + 1020, ry + 2, r[5], 12, TXT)
-        w.d.line([x0 + 31, ry + 27, x1 - 31, ry + 27], fill="#EDEDED")
+        w.d.line([x0 + 31, ry + 27, x1 - 31, ry + 27], fill="#2E2E2E")
         ry += 32
     w.statusbar("Соединение с ЕГАИС активно   |   Транспорт: RSA-ключ, ГОСТ 2012")
     w.save(os.path.join(OUT, "egais_utm.png"))
@@ -151,7 +162,7 @@ def buh_1c():
                      "Печать", "Обновить"],
             status="Пользователь: Бухгалтер   |   Режим: сервер   |   База: BuhRomashka")
     x0, y0, x1 = w.x0, w.cy0, w.x1
-    w.d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 31], fill="#F5F7F9")
+    w.d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 31], fill="#1E1E1E")
     w.sidebar(x0 + 1, y0, 280, ["Главное", "Банк и касса", "Продажи", "Покупки",
                                 "Склад", "Производство", "ОС и НМА",
                                 "Нематериальные активы", "Зарплата и кадры",
@@ -180,7 +191,7 @@ def buh_1c():
     for k, v in rows:
         w.text(x0 + 330, yy, k, 12, MUTED)
         w.text(x1 - 500, yy, v, 12, TXT, bold=True, anchor="ra")
-        w.d.line([x0 + 330, yy + 22, x0 + 850, yy + 22], fill="#EDEDED")
+        w.d.line([x0 + 330, yy + 22, x0 + 850, yy + 22], fill="#2E2E2E")
         yy += 32
     w.panel(x0 + 900, y0 + 228, 330, 190)
     w.text(x0 + 920, y0 + 240, "Задачи и напоминания", 14, TXT, bold=True)
@@ -188,13 +199,13 @@ def buh_1c():
              "Сверить банковские выписки", "Обновить классификатор БК"]
     yy = y0 + 272
     for t in tasks:
-        w.d.rectangle([x0 + 920, yy + 2, x0 + 934, yy + 16], outline="#8A8A8A", fill=WHITE)
+        w.d.rectangle([x0 + 920, yy + 2, x0 + 934, yy + 16], outline="#6A6A6A", fill=WHITE)
         w.text(x0 + 944, yy, t, 12, TXT)
         yy += 28
     # журнал операций
     w.panel(x0 + 310, y0 + 432, 920, 232)
     w.text(x0 + 330, y0 + 444, "Журнал операций", 14, TXT, bold=True)
-    w.d.rectangle([x0 + 322, y0 + 470, x1 - 32, y0 + 496], fill="#EDF1F6")
+    w.d.rectangle([x0 + 322, y0 + 470, x1 - 32, y0 + 496], fill="#2C2C2C")
     for lab, cx in [("Дата", x0 + 334), ("Документ", x0 + 420), ("Содержание", x0 + 640),
                     ("Сумма", x0 + 980)]:
         w.text(cx, y0 + 477, lab, 12, TXT, bold=True)
@@ -224,7 +235,7 @@ def tpp_scheme():
     f = Flow(1400, 980)
     f.title("Функциональная схема технической подготовки производства (ТПП)")
     f.block("plan", 540, 58, 320, 56, "План производства\n(заказ, программа выпуска)",
-            "rect", "#DCE9F7", BLUE, 14)
+            "rect", "#2D4B63", BLUE, 14)
     f.block("konstr", 90, 160, 380, 74, "1. Конструкторская подготовка\n(КПП): "
             "чертежи, 3D-модели,\nспецификации, ЕСКД", "rect", LBLUE, BLUE, 13)
     f.block("tehn", 510, 160, 380, 74, "2. Технологическая подготовка\n(ТПП): "
@@ -235,44 +246,44 @@ def tpp_scheme():
     f.link("plan", "tehn")
     f.link("plan", "osnast")
     f.block("rm", 90, 276, 380, 66, "Рабочая документация,\nведомости, извещения об "
-            "изменениях", "doc", "#FFFFFF", "#9AA9B8", 12)
+            "изменениях", "doc", "#1F1F1F", "#9AA9B8", 12)
     f.block("norm", 510, 276, 380, 66, "Нормы расхода материалов,\nтрудоёмкость, "
-            "расценки", "doc", "#FFFFFF", "#9AA9B8", 12)
+            "расценки", "doc", "#1F1F1F", "#9AA9B8", 12)
     f.block("model", 930, 276, 380, 66, "Модель изделия, состав\n(спецификация, BOM)",
-            "doc", "#FFFFFF", "#9AA9B8", 12)
+            "doc", "#1F1F1F", "#9AA9B8", 12)
     for a, b in (("konstr", "rm"), ("tehn", "norm"), ("osnast", "model")):
         f.link(a, b)
     f.block("sapr", 60, 388, 380, 78, "САПР (CAD/CAE):\nКОМПАС-3D, SolidWorks,\n"
-            "AutoCAD, Siemens NX", "rect", "#F2F2F2", "#8A8A8A", 12)
+            "AutoCAD, Siemens NX", "rect", "#2A2A2A", "#6A6A6A", 12)
     f.block("cam", 500, 388, 380, 78, "САПР ТП / CAM (CAPP):\nВЕРТИКАЛЬ, "
-            "TechCard,\nSprutCAM", "rect", "#F2F2F2", "#8A8A8A", 12)
+            "TechCard,\nSprutCAM", "rect", "#2A2A2A", "#6A6A6A", 12)
     f.block("pdm", 940, 388, 380, 78, "PDM/PLM-система:\nLOTSMAN PLM, "
-            "1С:PDM,\nTeamcenter", "rect", "#F2F2F2", "#8A8A8A", 12)
-    f.link("rm", "sapr", dashed=True, head=False, color="#8A8A8A")
-    f.link("norm", "cam", dashed=True, head=False, color="#8A8A8A")
-    f.link("model", "pdm", dashed=True, head=False, color="#8A8A8A")
+            "1С:PDM,\nTeamcenter", "rect", "#2A2A2A", "#6A6A6A", 12)
+    f.link("rm", "sapr", dashed=True, head=False, color="#6A6A6A")
+    f.link("norm", "cam", dashed=True, head=False, color="#6A6A6A")
+    f.link("model", "pdm", dashed=True, head=False, color="#6A6A6A")
     f.block("erp", 420, 512, 560, 80, "Единое информационное пространство предприятия:\n"
             "ERP / MES, справочники (классификаторы ЕСКД, ЕСТД),\nхранилище данных",
-            "rect", "#DCE9F7", BLUE, 13)
+            "rect", "#2D4B63", BLUE, 13)
     for a in ("sapr", "cam", "pdm"):
         f.link(a, "erp")
     f.block("launch", 470, 636, 460, 66, "4. Запуск производства:\nвыдача заданий, "
-            "обеспечение оснасткой", "rect", "#FDF3E2", "#C98A2B", 13)
+            "обеспечение оснасткой", "rect", "#3A2C12", "#F0A93B", 13)
     f.link("erp", "launch")
     f.block("prod", 120, 748, 300, 62, "Производственные\nучастки, цеха", "rect",
-            "#EFEFEF", "#7A7A7A", 12)
+            "#2A2A2A", "#8A8A8A", 12)
     f.block("qc", 520, 748, 300, 62, "Служба качества:\nконтроль, испытания", "rect",
-            "#EFEFEF", "#7A7A7A", 12)
+            "#2A2A2A", "#8A8A8A", 12)
     f.block("act", 920, 748, 300, 62, "Актуализация данных\nТПП (обратная связь)",
-            "rect", "#EFEFEF", "#7A7A7A", 12)
+            "rect", "#2A2A2A", "#8A8A8A", 12)
     f.link("launch", "prod")
     f.link("launch", "qc")
     f.link("launch", "act")
-    f.caption(920, 826, "Обратная связь: изменения конструкции и технологии", 12, "#5D5D5D")
-    f.caption(920, 846, "возвращаются в конструкторскую и технологическую", 12, "#5D5D5D")
-    f.caption(920, 866, "подготовку производства", 12, "#5D5D5D")
+    f.caption(920, 826, "Обратная связь: изменения конструкции и технологии", 12, "#C5C5C5")
+    f.caption(920, 846, "возвращаются в конструкторскую и технологическую", 12, "#C5C5C5")
+    f.caption(920, 866, "подготовку производства", 12, "#C5C5C5")
     f.caption(30, f.H - 34, "Составлено автором по данным ГОСТ 14.001-2004 "
-              "(Технологическая подготовка производства)", 12, "#5D5D5D")
+              "(Технологическая подготовка производства)", 12, "#C5C5C5")
     f.save(os.path.join(OUT, "tpp_scheme.png"))
 
 
@@ -284,13 +295,13 @@ def ya_search():
     x0, y0, x1 = w.x0, w.cy0, w.x1
     d = w.d
     d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 30], fill=WHITE)
-    d.text((x0 + 24, y0 + 14), "Яндекс", fill="#B03030", font=font(16, True))
+    d.text((x0 + 24, y0 + 14), "Яндекс", fill="#FC3F1D", font=font(16, True))
     d.rounded_rectangle([x0 + 110, y0 + 8, x0 + 700, y0 + 44], radius=6, fill=WHITE,
                         outline="#4A4A4A", width=2)
     d.text((x0 + 124, y0 + 15), "Информационная система", fill=TXT, font=font(14))
-    d.line([x0 + 660, y0 + 8, x0 + 660, y0 + 44], fill="#C6C6C6")
+    d.line([x0 + 660, y0 + 8, x0 + 660, y0 + 44], fill="#4A4A4A")
     d.rounded_rectangle([x0 + 700, y0 + 8, x0 + 800, y0 + 44], radius=6, fill="#FC3F1D")
-    d.text((x0 + 750, y0 + 17), "Найти", fill=WHITE, font=font(14), anchor="ma")
+    d.text((x0 + 750, y0 + 17), "Найти", fill="#FFFFFF", font=font(14), anchor="ma")
     d.text((x0 + 830, y0 + 18), "Почта   Диск", fill=MUTED, font=font(12))
     d.text((x0 + 110, y0 + 54), "Найдено 142 млн результатов за 0,38 с", fill=MUTED, font=font(12))
     res = [("Информационная система — Википедия", "wikipedia.org",
@@ -312,12 +323,12 @@ def ya_search():
     for i, (t, url, snip) in enumerate(res):
         if i == 0:
             d.rounded_rectangle([x0 + 100, ry - 6, x0 + 900, ry + 96], radius=8,
-                                fill="#F7F7F7")
+                                fill="#252525")
         d.text((x0 + 112, ry), t, fill="#0A5BB5", font=font(15, True))
         d.text((x0 + 112, ry + 22), url, fill="#0B7B3E", font=font(12))
         w.wrap(x0 + 112, ry + 44, snip, 800, 13, TXT, lh=20)
         ry += 104
-    w.statusbar("Найдено: 142 млн результатов   |   Регион: Самара   |   "
+    w.statusbar("Найдено: 142 млн результатов   |   Регион: Новокуйбышевск   |   "
                 "Язык: русский", "Стр. 1")
     w.save(os.path.join(OUT, "yandex_search.png"))
 
@@ -329,17 +340,16 @@ def consultant():
                   "Справочная информация"])
     x0, y0, x1 = w.x0, w.cy0, w.x1
     d = w.d
-    d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 30], fill="#F5F7FA")
-    d.text((x0 + 24, y0 + 14), "КонсультантПлюс", fill="#0F4C81", font=font(16, True))
-    d.text((x0 + 200, y0 + 17), "Законодательство России   |   Самарская область",
+    d.rectangle([x0 + 1, y0, x1 - 1, w.box[3] - 30], fill="#1E1E1E")
+    d.text((x0 + 24, y0 + 14), "КонсультантПлюс", fill="#4CC2FF", font=font(16, True))
+    d.text((x0 + 218, y0 + 17), "Законодательство России   |   Самарская область",
            fill=MUTED, font=font(12))
     d.rounded_rectangle([x0 + 24, y0 + 52, x1 - 24, y0 + 92], radius=6, fill=WHITE,
-                        outline="#C6C6C6")
+                        outline="#4A4A4A")
     d.text((x0 + 40, y0 + 64), "Введите вопрос или реквизиты документа", fill=MUTED, font=font(14))
-    d.line([x0 + 560, y0 + 52, x0 + 560, y0 + 92], fill="#DDDDDD")
-    d.rounded_rectangle([x0 + 580, y0 + 60, x1 - 40, y0 + 84], radius=4, fill="#0F4C81")
-    d.text(((x0 + 580 + x1 - 40) / 2, y0 + 65), "Найти", fill=WHITE, font=font(13),
-           anchor="ma")
+    d.line([x0 + 560, y0 + 52, x0 + 560, y0 + 92], fill="#4A4A4A")
+    d.rounded_rectangle([x0 + 580, y0 + 60, x0 + 720, y0 + 86], radius=4, fill="#4CC2FF")
+    d.text((x0 + 650, y0 + 65), "Найти", fill="#102A36", font=font(13), anchor="ma")
     # карточки разделов
     cards = [("Законодательство", "Более 3 500 000 документов"), ("Судебная практика",
              "Решения судов всех инстанций"), ("Финансовые консультации",
@@ -349,15 +359,15 @@ def consultant():
         cx = x0 + 24 + (i % 2) * 600
         cy = y0 + 112 + (i // 2) * 96
         d.rounded_rectangle([cx, cy, cx + 580, cy + 82], radius=6, fill=WHITE,
-                            outline="#D5DCE5")
-        d.rectangle([cx, cy, cx + 6, cy + 82], fill="#0F4C81")
+                            outline="#4A4A4A")
+        d.rectangle([cx, cy, cx + 6, cy + 82], fill="#4CC2FF")
         d.text((cx + 22, cy + 16), t, fill=TXT, font=font(14, True))
         d.text((cx + 22, cy + 42), s, fill=MUTED, font=font(12))
     # карточка поиска
     d.rounded_rectangle([x0 + 24, y0 + 310, x1 - 24, y0 + 470], radius=6, fill=WHITE,
-                        outline="#D5DCE5")
+                        outline="#4A4A4A")
     d.text((x0 + 44, y0 + 324), "Карточка поиска: результаты", fill=TXT, font=font(14, True))
-    d.rectangle([x0 + 36, y0 + 352, x1 - 36, y0 + 378], fill="#EDF1F6")
+    d.rectangle([x0 + 36, y0 + 352, x1 - 36, y0 + 378], fill="#2C2C2C")
     for lab, cx in [("Документ", x0 + 48), ("Вид документа", x0 + 520),
                     ("Дата", x0 + 760), ("Статус", x0 + 940)]:
         d.text((cx, y0 + 358), lab, fill=TXT, font=font(12, True))
@@ -375,13 +385,13 @@ def consultant():
         w.fit(x0 + 48, ry + 1, r[0], 460, 12, TXT, bold=(i == 0))
         d.text((x0 + 520, ry + 1), r[1], fill=TXT, font=font(12))
         d.text((x0 + 760, ry + 1), r[2], fill=TXT, font=font(12))
-        d.text((x0 + 940, ry + 1), r[3], fill="#2E7D32", font=font(12))
+        d.text((x0 + 940, ry + 1), r[3], fill="#6CCB5F", font=font(12))
         ry += 26
     # текст документа
     d.rounded_rectangle([x0 + 24, y0 + 486, x1 - 24, w.box[3] - 46], radius=6, fill=WHITE,
-                        outline="#D5DCE5")
-    d.text((x0 + 44, y0 + 500), "Статья 2. Основные понятия, используемые в настоящем "
-           "Федеральном законе", fill=TXT, font=font(14, True))
+                        outline="#4A4A4A")
+    d.text((x0 + 44, y0 + 498), "Статья 2. Основные понятия, используемые в настоящем "
+           "Федеральном законе", fill=TXT, font=font(13, True))
     lines = ["1) информация — сведения (сообщения, данные) независимо от формы их "
              "представления;",
              "2) информационные технологии — процессы, методы поиска, сбора, хранения,",
@@ -392,10 +402,10 @@ def consultant():
              "технических средств;",
              "4) информационно-телекоммуникационная сеть — технологическая система,",
              "предназначенная для передачи по линиям связи информации…"]
-    yy = y0 + 524
-    for l in lines[:8]:
+    yy = y0 + 522
+    for l in lines[:6]:
         d.text((x0 + 44, yy), l, fill=TXT, font=font(11))
-        yy += 18
+        yy += 17
     w.statusbar("КонсультантПлюс   |   Документов в информационном банке: 3 512 847")
     w.save(os.path.join(OUT, "consultant.png"))
 

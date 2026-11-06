@@ -19,15 +19,28 @@ def font(size, bold=False, mono=False):
     return _cache[key]
 
 
-WHITE = "#FFFFFF"
-BG = "#F3F3F3"
-CARD = "#FFFFFF"
-TXT = "#1B1B1B"
-MUTED = "#5D5D5D"
-LINE = "#E1E1E1"
-ACCENT = "#0F6CBD"
-SEL = "#DCE9F7"
-HOVER = "#F0F0F0"
+# --- палитра тёмной темы Windows 11 -------------------------------------
+WHITE = "#202020"          # фон основных панелей/полей (как в тёмной теме)
+BG = "#202020"
+CARD = "#2B2B2B"           # карточки, сгруппированные панели
+CARD2 = "#323232"
+TXT = "#FFFFFF"
+MUTED = "#C5C5C5"
+SUBTLE = "#9A9A9A"
+LINE = "#3A3A3A"
+LINE2 = "#484848"
+ACCENT = "#4CC2FF"
+SEL = "#2D4B63"            # выделение строки списка
+HOVER = "#383838"
+BTN = "#2D2D2D"            # обычная кнопка
+BTN_HOVER = "#3A3A3A"
+FIELD = "#1F1F1F"          # поле ввода
+CHROME = "#202020"         # заголовок окна
+TOPACC = "#1A1A1A"         # акцентная полоса окна
+TITLE_INACTIVE = "#8A8A8A"
+SUCCESS = "#6CCB5F"
+WARN = "#FCE100"
+DANGER = "#FF99A4"
 
 
 def rounded(d, box, r, fill=None, outline=None, width=1):
@@ -35,33 +48,37 @@ def rounded(d, box, r, fill=None, outline=None, width=1):
 
 
 def desktop(w, h):
-    """Мягкий градиентный «рабочий стол» Windows 11."""
-    img = Image.new("RGB", (w, h), "#0B3D6B")
+    """Тёмные обои Windows 11 (цветок из сине-фиолетовых лепестков)."""
+    img = Image.new("RGB", (w, h), "#0A0A12")
     d = ImageDraw.Draw(img)
     for y in range(h):
         t = y / h
-        r = int(10 + 40 * t)
-        g = int(48 + 70 * t)
-        b = int(96 + 90 * t)
-        d.line([(0, y), (w, y)], fill=(r, g, b))
-    # «лепестки» цветка Windows 11
+        d.line([(0, y), (w, y)], fill=(int(10 + 8 * t), int(10 + 6 * t), int(18 + 22 * t)))
     blob = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     bd = ImageDraw.Draw(blob)
     cx, cy = w * 0.5, h * 0.52
-    bd.ellipse([cx - w * 0.30, cy - h * 0.34, cx + w * 0.12, cy + h * 0.10],
-               fill=(70, 150, 230, 90))
-    bd.ellipse([cx - w * 0.06, cy - h * 0.12, cx + w * 0.32, cy + h * 0.30],
-               fill=(120, 90, 210, 80))
-    blob = blob.filter(ImageFilter.GaussianBlur(60))
+    bd.ellipse([cx - w * 0.34, cy - h * 0.40, cx + w * 0.10, cy + h * 0.14],
+               fill=(32, 86, 170, 120))
+    bd.ellipse([cx - w * 0.02, cy - h * 0.16, cx + w * 0.36, cy + h * 0.34],
+               fill=(86, 46, 160, 110))
+    bd.ellipse([cx - w * 0.30, cy + h * 0.06, cx + w * 0.16, cy + h * 0.44],
+               fill=(18, 120, 150, 90))
+    blob = blob.filter(ImageFilter.GaussianBlur(70))
     img = Image.alpha_composite(img.convert("RGBA"), blob).convert("RGB")
-    return img
+    # лёгкая виньетка
+    vig = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(vig).ellipse([-w * 0.2, -h * 0.2, w * 1.2, h * 1.2], fill=60)
+    vig = vig.filter(ImageFilter.GaussianBlur(120))
+    dark = Image.new("RGB", (w, h), (0, 0, 0))
+    return Image.composite(img, dark, vig.point(lambda v: 255 - v))
 
 
 class Win:
     """Окно приложения. Координаты содержимого — в пикселях изображения."""
 
     def __init__(self, w=1250, h=800, title="", tabs=None, accent=ACCENT,
-                 margin=16, ribbon=None, status=None, toolbar=None):
+                 margin=16, ribbon=None, status=None, toolbar=None,
+                 toolbar_style="bar", app="", dark=True):
         self.W, self.H = w, h
         self.base = desktop(w, h)
         self.img = self.base.convert("RGBA")
@@ -80,14 +97,14 @@ class Win:
         self.d = ImageDraw.Draw(self.img)
 
         self.box = (x0, y0, x1, y1)
-        self.d.rounded_rectangle(self.box, radius=12, fill="#FAFAFA",
-                                 outline="#C9C9C9", width=1)
-        # заголовок окна
+        self.d.rounded_rectangle(self.box, radius=10, fill="#202020",
+                                 outline="#3A3A3A", width=1)
+        # заголовок окна (тёмная тема: фон окна + тонкая линия)
         self.title_h = 42
-        self.d.rounded_rectangle([x0, y0, x1, y0 + self.title_h + 12], radius=12,
-                                 fill="#F3F3F3")
+        self.d.rounded_rectangle([x0, y0, x1, y0 + self.title_h + 12], radius=10,
+                                 fill="#202020")
         self.d.rectangle([x0 + 1, y0 + self.title_h, x1 - 1, y0 + self.title_h + 12],
-                         fill="#F3F3F3")
+                         fill="#202020")
         # иконка приложения
         self.app_icon(x0 + 16, y0 + 13)
         self.text(x0 + 42, y0 + 11, title, 15, TXT)
@@ -102,8 +119,12 @@ class Win:
         if ribbon:
             self.ribbon(ribbon)
         if toolbar:
-            self.toolbar(toolbar, x0 + 14, self.y + 8, x1 - 14)
-            self.y += 44
+            if toolbar_style == "menu":
+                self.toolbar(toolbar, x0 + 10, self.y + 2, x1 - 14, style="menu")
+                self.y += 30
+            else:
+                self.toolbar(toolbar, x0 + 14, self.y + 8, x1 - 14)
+                self.y += 44
         if status:
             self.statusbar(status)
         self.x0, self.x1 = x0, x1
@@ -113,17 +134,26 @@ class Win:
     def app_icon(self, x, y):
         d = self.d
         d.rounded_rectangle([x, y, x + 17, y + 17], radius=4, fill=self.accent)
-        d.rounded_rectangle([x + 4, y + 4, x + 13, y + 13], radius=2, fill="#FFFFFF")
+        d.rounded_rectangle([x + 4, y + 4, x + 13, y + 13], radius=2, fill="#102A36")
 
     def _cap_buttons(self, bx, by):
         d = self.d
         by = by + 4
-        d.line([bx - 24, by + 1, bx - 16, by + 1], fill="#3A3A3A", width=1)
-        d.rectangle([bx - 2, by - 3, bx + 8, by + 5], outline="#3A3A3A", width=1)
-        cx, cy = bx + 26, by + 1
-        d.line([cx - 5, cy - 5, cx + 5, cy + 5], fill="#3A3A3A", width=2)
-        d.line([cx - 5, cy + 5, cx + 5, cy - 5], fill="#3A3A3A", width=2)
-        self._close_rect = (cx - 14, by - 10, cx + 14, by + 10)
+        glyph = "#D6D6D6"
+        # закрыть — с красной подсветкой
+        d.rounded_rectangle([bx + 14, by - 12, bx + 42, by + 14], radius=4, fill="#C42B1C")
+        cx = bx + 28
+        d.line([cx - 5, by - 4, cx + 5, by + 6], fill="#FFFFFF", width=1)
+        d.line([cx - 5, by + 6, cx + 5, by - 4], fill="#FFFFFF", width=1)
+        # развернуть
+        mx = bx - 6
+        d.line([mx - 5, by - 5, mx + 5, by - 5], fill=glyph, width=1)
+        d.line([mx - 5, by - 5, mx - 5, by + 5], fill=glyph, width=1)
+        d.line([mx - 5, by + 5, mx + 5, by + 5], fill=glyph, width=1)
+        d.line([mx + 5, by + 5, mx + 5, by - 5], fill=glyph, width=1)
+        # свернуть
+        d.line([bx - 40, by + 1, bx - 26, by + 1], fill=glyph, width=1)
+        self._close_rect = (bx + 14, by - 12, bx + 42, by + 14)
 
     def text(self, x, y, s, size=15, color=TXT, bold=False, mono=False, anchor="la"):
         self.d.text((x, y), s, font=font(size, bold, mono), fill=color, anchor=anchor)
@@ -173,7 +203,7 @@ class Win:
         x0, x1 = self.box[0], self.box[2]
         top = self.y
         h = 76
-        self.d.rectangle([x0 + 1, top, x1 - 1, top + h], fill="#FBFBFB")
+        self.d.rectangle([x0 + 1, top, x1 - 1, top + h], fill="#262626")
         self.d.line([x0 + 1, top + h, x1 - 1, top + h], fill=LINE)
         if isinstance(items, str):
             items = [(items, "")]
@@ -181,30 +211,39 @@ class Win:
         for label, sub in items:
             w = int(self.d.textlength(label, font=font(14))) + 22
             self.d.rounded_rectangle([cx, top + 12, cx + w, top + 44], radius=5,
-                                     fill="#FFFFFF", outline="#C8C8C8")
+                                     fill="#2D2D2D", outline="#494949")
             self.text(cx + 11, top + 19, label, 14)
             cx += w + 8
         if items and items[0][1]:
             self.text(x0 + 16, top + 52, items[0][1], 12, MUTED)
         self.y = top + h + 1
 
-    def toolbar(self, items, x, y, x1):
-        self.d.rounded_rectangle([x, y, x1, y + 30], radius=5, fill="#FFFFFF",
-                                 outline="#D5D5D5")
+    def toolbar(self, items, x, y, x1, style="bar"):
+        if style == "menu":
+            cx = x + 4
+            self._tb = []
+            for it in items:
+                w = int(self.d.textlength(it, font=font(14))) + 20
+                self.text(cx + 10, y + 4, it, 14, "#FFFFFF")
+                self._tb.append((it, cx, w))
+                cx += w + 2
+            return
+        self.d.rounded_rectangle([x, y, x1, y + 30], radius=5, fill="#2B2B2B",
+                                 outline="#454545")
         cx = x + 10
         self._tb = []
         for it in items:
             w = int(self.d.textlength(it, font=font(14))) + 18
-            self.text(cx, y + 6, it, 14, "#1B1B1B")
+            self.text(cx, y + 6, it, 14, "#FFFFFF")
             self._tb.append((it, cx - 4, w))
             cx += w + 6
             if it != items[-1]:
-                self.d.line([cx - 6, y + 6, cx - 6, y + 24], fill="#E5E5E5")
+                self.d.line([cx - 6, y + 6, cx - 6, y + 24], fill="#454545")
 
     def statusbar(self, left, right=None):
         x0, x1 = self.box[0], self.box[2]
         y = self.box[3] - 30
-        self.d.rectangle([x0 + 1, y, x1 - 1, y + 29], fill="#F3F3F3")
+        self.d.rectangle([x0 + 1, y, x1 - 1, y + 29], fill="#1B1B1B")
         self.d.line([x0 + 1, y, x1 - 1, y], fill=LINE)
         self.text(x0 + 14, y + 7, left, 13, MUTED)
         if right:
@@ -216,7 +255,7 @@ class Win:
                                  outline=outline, width=1)
 
     def sidebar(self, x, y, w, items, active=0, title=None):
-        self.d.rectangle([x, y, x + w, self.box[3] - 1], fill="#F7F7F7")
+        self.d.rectangle([x, y, x + w, self.box[3] - 1], fill="#252525")
         self.d.line([x + w, y, x + w, self.box[3] - 1], fill=LINE)
         cy = y + 14
         if title:
@@ -250,23 +289,25 @@ class Win:
         return y + 26
 
     def field(self, x, y, w, value="", h=30, size=14, mono=False, caret=False):
-        self.d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill="#FFFFFF",
-                                 outline="#B6B6B6")
-        self.d.rectangle([x + 1, y + h // 2 - 7, x + 4, y + h // 2 + 7], fill="#B6B6B6")
+        self.d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill="#1F1F1F",
+                                 outline="#4A4A4A")
+        self.d.rounded_rectangle([x, y, x + w, y + h], radius=4, outline="#1F1F1F")
+        self.d.rectangle([x, y + 2, x + w, y + h - 2], fill="#1F1F1F")
+        self.d.line([x + 1, y + h, x + w - 1, y + h], fill="#5A5A5A")
         self.text(x + 10, y + (h - size) // 2 - 2, value, size, TXT, mono=mono)
         if caret:
             cx = x + 12 + self.d.textlength(value, font=font(size, mono=mono))
-            self.d.line([cx, y + 6, cx, y + h - 6], fill="#1B1B1B", width=1)
+            self.d.line([cx, y + 6, cx, y + h - 6], fill="#FFFFFF", width=1)
 
     def button(self, x, y, w, label, primary=False, h=30, size=14, enabled=True,
                arrow=False):
         if primary:
             self.d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill=self.accent)
-            col = "#FFFFFF"
+            col = "#10230C" if False else "#102A36"
         else:
-            self.d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill="#FDFDFD",
-                                     outline="#C6C6C6")
-            col = TXT if enabled else "#9A9A9A"
+            self.d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill="#2D2D2D",
+                                     outline="#4A4A4A")
+            col = TXT if enabled else "#8A8A8A"
         self.text(x + w // 2, y + (h - size) // 2 - 1, label, size, col,
                   anchor="ma")
         if arrow:
@@ -275,7 +316,7 @@ class Win:
     def checkbox(self, x, y, label, checked=True, size=14):
         b = 16
         self.d.rounded_rectangle([x, y + 3, x + b, y + 3 + b], radius=3,
-                                 fill="#FFFFFF", outline="#8A8A8A")
+                                 fill="#1F1F1F", outline="#8A8A8A")
         if checked:
             self.d.rounded_rectangle([x, y + 3, x + b, y + 3 + b], radius=3, fill=self.accent)
             self.d.line([x + 4, y + 11, x + 7, y + 14], fill="#FFFFFF", width=2)
@@ -285,7 +326,7 @@ class Win:
 
     def radio(self, x, y, label, selected=False, size=14, w=None):
         r = 15
-        self.d.ellipse([x, y + 4, x + r, y + 4 + r], outline="#8A8A8A", fill="#FFFFFF")
+        self.d.ellipse([x, y + 4, x + r, y + 4 + r], outline="#8A8A8A", fill="#1F1F1F")
         if selected:
             self.d.ellipse([x + 4, y + 8, x + r - 4, y + 4 + r - 4], fill=self.accent)
         self.text(x + r + 8, y, label, size, TXT)
@@ -294,8 +335,8 @@ class Win:
     def menu(self, x, y, items, width=250, highlight=None, checked=None):
         h = 32
         total = sum(h for it in items if it is not None) + 12
-        self.d.rounded_rectangle([x, y, x + width, y + total], radius=6, fill="#FBFBFB",
-                                 outline="#C4C4C4")
+        self.d.rounded_rectangle([x, y, x + width, y + total], radius=6, fill="#2B2B2B",
+                                 outline="#4A4A4A")
         cy = y + 6
         for i, it in enumerate(items):
             if it is None:
@@ -311,7 +352,7 @@ class Win:
             cy += h
         return y + total
 
-    def arrow(self, x1, y1, x2, y2, color="#4A4A4A", width=2, head=8):
+    def arrow(self, x1, y1, x2, y2, color="#B0B0B0", width=2, head=8):
         self.d.line([x1, y1, x2, y2], fill=color, width=width)
         import math
         a = math.atan2(y2 - y1, x2 - x1)
@@ -340,14 +381,15 @@ def dialog(title, ww, hh, W=1100, H=760, subtitle=None, icon_color=ACCENT):
     from PIL import ImageFilter as _IF
     img = Image.alpha_composite(img, sh.filter(_IF.GaussianBlur(12)))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([x, y, x + ww, y + hh], radius=10, fill="#F5F5F5",
-                        outline="#BFBFBF")
-    d.rounded_rectangle([x, y, x + ww, y + 40], radius=10, fill="#EDEDED")
-    d.rectangle([x + 1, y + 28, x + ww - 1, y + 40], fill="#EDEDED")
+    d.rounded_rectangle([x, y, x + ww, y + hh], radius=8, fill="#202020",
+                        outline="#3F3F3F")
+    d.rounded_rectangle([x, y, x + ww, y + 40], radius=8, fill="#202020")
+    d.rectangle([x + 1, y + 30, x + ww - 1, y + 40], fill="#202020")
+    d.line([x + 1, y + 40, x + ww - 1, y + 40], fill="#3A3A3A")
     d.text((x + 14, y + 11), title, font=font(15), fill=TXT)
     cx = x + ww - 26
-    d.line([cx - 5, y + 15, cx + 5, y + 25], fill="#3A3A3A", width=2)
-    d.line([cx - 5, y + 25, cx + 5, y + 15], fill="#3A3A3A", width=2)
+    d.line([cx - 5, y + 15, cx + 5, y + 25], fill="#D6D6D6", width=1)
+    d.line([cx - 5, y + 25, cx + 5, y + 15], fill="#D6D6D6", width=1)
     if subtitle:
         d.text((x + 20, y + 52), subtitle, font=font(14, bold=True), fill=TXT)
     return img, d, (x, y, x + ww, y + hh)
@@ -364,37 +406,37 @@ def dialog_buttons(d, box, labels=("ОК", "Отмена"), y=None, primary_firs
         prim = (i == 0 and primary_first)
         if prim:
             d.rounded_rectangle([bx, y, bx + bw, y + 32], radius=4, fill=ACCENT)
-            d.text((bx + bw / 2, y + 8), lab, font=font(14), fill="#FFFFFF", anchor="ma")
+            d.text((bx + bw / 2, y + 8), lab, font=font(14), fill="#102A36", anchor="ma")
         else:
-            d.rounded_rectangle([bx, y, bx + bw, y + 32], radius=4, fill="#FDFDFD",
-                                outline="#C6C6C6")
+            d.rounded_rectangle([bx, y, bx + bw, y + 32], radius=4, fill="#2D2D2D",
+                                outline="#4A4A4A")
             d.text((bx + bw / 2, y + 8), lab, font=font(14), fill=TXT, anchor="ma")
     return sx
 
 
 def text_field(d, x, y, w, value="", h=30, size=14, focused=False, mono=False,
                placeholder=None):
-    d.rounded_rectangle([x, y, x + w, y + h], radius=3, fill="#FFFFFF",
-                        outline=ACCENT if focused else "#B0B0B0",
+    d.rounded_rectangle([x, y, x + w, y + h], radius=3, fill="#1F1F1F",
+                        outline=ACCENT if focused else "#4A4A4A",
                         width=2 if focused else 1)
     if value:
         d.text((x + 9, y + (h - size) // 2 - 2), value, font=font(size, mono=mono), fill=TXT)
     elif placeholder:
         d.text((x + 9, y + (h - size) // 2 - 2), placeholder, font=font(size),
-               fill="#9A9A9A")
+               fill="#7A7A7A")
 
 
 def str_list(d, x, y, w, rows, h=26, size=14, sel=None, checkboxes=False,
              checked=None, bold_first=False):
     y0 = y
-    d.rectangle([x, y, x + w, y + h * len(rows) + 4], fill="#FFFFFF", outline="#C0C0C0")
+    d.rectangle([x, y, x + w, y + h * len(rows) + 4], fill="#1F1F1F", outline="#4A4A4A")
     cy = y + 2
     for i, r in enumerate(rows):
         if sel is not None and i == sel:
             d.rectangle([x + 1, cy, x + w - 1, cy + h - 2], fill=SEL)
         tx = x + 8
         if checkboxes:
-            d.rectangle([x + 8, cy + 6, x + 21, cy + 19], outline="#8A8A8A", fill="#FFFFFF")
+            d.rectangle([x + 8, cy + 6, x + 21, cy + 19], outline="#8A8A8A", fill="#1F1F1F")
             if checked and i in checked:
                 d.rectangle([x + 8, cy + 6, x + 21, cy + 19], fill=ACCENT)
                 d.line([x + 11, cy + 13, x + 13, cy + 16], fill="#FFFFFF", width=2)
@@ -419,14 +461,15 @@ def win_modal(win, ww, hh, title, dim=True, y_off=0):
                                         radius=12, fill=(0, 0, 0, 130))
     win.img = Image.alpha_composite(win.img, sh.filter(_IF.GaussianBlur(10)))
     d = ImageDraw.Draw(win.img)
-    d.rounded_rectangle([x, y, x + ww, y + hh], radius=8, fill="#F5F5F5",
-                        outline="#BDBDBD")
-    d.rounded_rectangle([x, y, x + ww, y + 38], radius=8, fill="#EDEDED")
-    d.rectangle([x + 1, y + 26, x + ww - 1, y + 38], fill="#EDEDED")
+    d.rounded_rectangle([x, y, x + ww, y + hh], radius=8, fill="#202020",
+                        outline="#3F3F3F")
+    d.rounded_rectangle([x, y, x + ww, y + 38], radius=8, fill="#202020")
+    d.rectangle([x + 1, y + 26, x + ww - 1, y + 38], fill="#202020")
+    d.line([x + 1, y + 38, x + ww - 1, y + 38], fill="#3A3A3A")
     d.text((x + 14, y + 10), title, font=font(15), fill=TXT)
     cx = x + ww - 24
-    d.line([cx - 5, y + 14, cx + 5, y + 24], fill="#3A3A3A", width=2)
-    d.line([cx - 5, y + 24, cx + 5, y + 14], fill="#3A3A3A", width=2)
+    d.line([cx - 5, y + 14, cx + 5, y + 24], fill="#D6D6D6", width=1)
+    d.line([cx - 5, y + 24, cx + 5, y + 14], fill="#D6D6D6", width=1)
     win.d = d
     return d, (x, y, x + ww, y + hh)
 
@@ -435,10 +478,10 @@ def mbutton(d, x, y, w, label, primary=False, h=30, size=13):
     """Кнопка в модальном окне (по ImageDraw)."""
     if primary:
         d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill=ACCENT)
-        col = "#FFFFFF"
+        col = "#102A36"
     else:
-        d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill="#FDFDFD",
-                            outline="#C6C6C6")
+        d.rounded_rectangle([x, y, x + w, y + h], radius=4, fill="#2D2D2D",
+                            outline="#4A4A4A")
         col = TXT
     d.text((x + w / 2, y + (h - size) // 2 - 1), label, font=font(size), fill=col,
            anchor="ma")
