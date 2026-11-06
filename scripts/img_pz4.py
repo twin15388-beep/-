@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 from mockui import (ACCENT, LINE, MUTED, SEL, TXT, WHITE, Win, dialog, dialog_buttons,
                     font, str_list, text_field, win_modal, text_field)
 
-OUT = "/tmp/img/pz4"
+OUT = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_4_МДК_06.02_реестр_и_архивация"
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -58,7 +58,7 @@ def regedit_base(selected="SOFTWARE", values=None, status="Готово"):
         ("CurrentBuild", "REG_SZ", "22631"),
         ("CurrentVersion", "REG_SZ", "6.3"),
         ("ProductName", "REG_SZ", "Windows 11 Pro"),
-        ("RegisteredOwner", "REG_SZ", "Разин К. Э."),
+        ("RegisteredOwner", "REG_SZ", "Разин К.Е."),
         ("RegisteredOrganization", "REG_SZ", "НГГТК"),
         ("InstallDate", "REG_DWORD", "0x61F2A4C1 (1649сут)"),
         ("InstallTime", "REG_QWORD", "0x01d9c4f2a8b13e77"),

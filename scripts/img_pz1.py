@@ -5,7 +5,7 @@ import os
 from flow import BLUE, GREEN, GREENL, LBLUE, ORANGE, ORANGEL, Flow
 from mockui import ACCENT, LINE, MUTED, SEL, TXT, WHITE, Win, font
 
-OUT = "/tmp/img/pz1"
+OUT = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_1_сценарий_и_договор"
 os.makedirs(OUT, exist_ok=True)
 
 

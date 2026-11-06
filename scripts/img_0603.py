@@ -7,7 +7,7 @@ from PIL import ImageDraw
 from flow import BLUE, GREEN, GREENL, GREY, LBLUE, ORANGE, ORANGEL, Flow
 from mockui import ACCENT, LINE, MUTED, SEL, TXT, WHITE, Win, font
 
-OUT = "/tmp/img/0603"
+OUT = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_МДК_06.03_схемы_и_интерфейсы"
 os.makedirs(OUT, exist_ok=True)
 
 

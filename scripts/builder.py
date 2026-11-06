@@ -53,7 +53,8 @@ def _no_split(row):
 class Report:
     """Документ отчёта с набором типовых элементов."""
 
-    def __init__(self, work_no, mdk, title, student="Разин К. Э.", group="47",
+    def __init__(self, work_no, mdk, title, student="Разин Константин Евгеньевич",
+                 student_short="Разин К.Е.", group="47",
                  specialty="", teacher="", city_year="Самара, 2026"):
         self.doc = Document()
         self.fig_no = 0
@@ -62,6 +63,7 @@ class Report:
         self.mdk = mdk
         self.title = title
         self.student = student
+        self.student_short = student_short
         self.group = group
         self.specialty = specialty
         self.teacher = teacher

@@ -6,7 +6,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from builder import Report
 
-IMG = "/tmp/img/pz1"
+IMG = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_1_сценарий_и_договор"
 OUT = "/home/user/-/Выполненные работы/ПЗ_1_Сценарий_сопровождения_договор_Разин.docx"
 
 r = Report(

@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 from mockui import (ACCENT, BG, CARD, LINE, MUTED, SEL, TXT, WHITE, Win, desktop,
                     font, rounded)
 
-OUT = "/tmp/img/pz2"
+OUT = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_1_МДК_06.02_анализ_ПО"
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -31,7 +31,7 @@ def start_menu():
     d.ellipse([px + 40, py + 30, px + 52, py + 42], outline="#5A5A5A", width=2)
     d.line([px + 51, py + 41, px + 57, py + 47], fill="#5A5A5A", width=2)
     d.text((px + 64, py + 28), "Поиск приложений и документов", font=font(14), fill=MUTED)
-    d.text((px + pw - 156, py + 30), "Разин К.Э.", font=font(13), fill=TXT)
+    d.text((px + pw - 156, py + 30), "Разин К.Е.", font=font(13), fill=TXT)
     d.ellipse([px + pw - 44, py + 22, px + pw - 14, py + 52], fill=ACCENT)
     d.text((px + pw - 29, py + 30), "РК", font=font(12, bold=True), fill="#FFFFFF", anchor="ma")
 

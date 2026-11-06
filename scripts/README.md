@@ -1,0 +1,34 @@
+# Генераторы отчётов и иллюстраций
+
+Отчёты собираются из Python-скриптов (python-docx + Pillow), иллюстрации рисуются кодом,
+поэтому любую правку можно внести и пересобрать за секунды.
+
+## Установка зависимостей
+
+```bash
+pip install python-docx pillow msoffcrypto-tool pyzipper
+```
+
+## Сборка
+
+```bash
+cd scripts
+python img_pz1.py && python img_pz2.py && python img_pz3.py \
+  && python img_pz4.py && python img_pz5.py && python img_0603.py   # иллюстрации
+python doc_pz1.py && python doc_pz2.py && python doc_pz3_0602.py \
+  && python doc_pz4_0602.py && python doc_pz5_0602.py && python doc_tz_0603.py \
+  && python doc_pz3_0603.py && python doc_pz45_0603.py && python doc_pz6_0603.py
+python make_pz3_files.py        # файлы ПЗ № 3 (пароли, архив, .doc)
+```
+
+| Скрипт | Что делает |
+|--------|-----------|
+| `builder.py` | оформление отчёта: поля, шрифт, титульный лист, таблицы, рисунки, блоки кода |
+| `mockui.py` | рисование макетов окон Windows/приложений (заголовки, ленты, списки, диалоги) |
+| `flow.py` | блок-схемы (этапы, ветвления, обратные связи) |
+| `img_pz*.py`, `img_0603.py` | иллюстрации по работам (пишут PNG в `Выполненные работы/Иллюстрации`) |
+| `doc_*.py` | сборка отчётов `.docx` |
+| `make_pz3_files.py` | файлы-результаты ПЗ № 3: шифрование docx, `writeProtection`, AES-zip, RTF-справка |
+
+Данные студента задаются в начале каждого `doc_*.py` через `Report(...)`:
+`student="Разин Константин Евгеньевич"`, `student_short="Разин К.Е."`, `group="47"`.

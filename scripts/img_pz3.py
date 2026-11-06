@@ -7,7 +7,7 @@ from PIL import ImageDraw
 from mockui import (ACCENT, LINE, MUTED, SEL, TXT, WHITE, Win, dialog_buttons,
                     font, str_list, text_field, win_modal)
 
-OUT = "/tmp/img/pz3"
+OUT = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_3_МДК_06.02_пароль_архив_антивирус"
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -100,7 +100,7 @@ def word_readonly():
            12, TXT)
     w.text(px + 70, y0 + 250, "Свойства: только чтение (флаг «Рекомендовать доступ "
            "только для чтения»)", 12, TXT)
-    w.text(px + 70, y0 + 272, "Автор: Разин К. Э., группа 47", 12, MUTED)
+    w.text(px + 70, y0 + 272, "Автор: Разин К.Е., группа 47", 12, MUTED)
     w.save(os.path.join(OUT, "word_readonly.png"))
 
 

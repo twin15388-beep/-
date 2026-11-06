@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 from mockui import (ACCENT, LINE, MUTED, SEL, TXT, WHITE, Win, dialog, dialog_buttons,
                     font, mbutton, text_field, win_modal)
 
-OUT = "/tmp/img/pz5"
+OUT = "/home/user/-/Выполненные работы/Иллюстрации/ПЗ_5_МДК_06.02_SQL_резервное_копирование"
 os.makedirs(OUT, exist_ok=True)
 SSMS = "#0F6CBD"
 
